@@ -1,0 +1,75 @@
+# Define the function to connect to a database
+function connect_database() {
+    echo "Enter the name of the database to connect to:"
+    read db_name                          # Prompt the user to enter the name of the database to connect to
+    db_dir="$ROOT_DIR/$db_name"           # Set the directory path for the specified database
+    if [ ! -d "$db_dir" ]; then           # Check if the directory for the specified database doesn't exist
+        echo "Database not found: $db_name"
+        read -p "Do you want to create a database with this name? (y/n)" choice  # Prompt the user to create a new database with the specified name
+        if [ "$choice" == "y" ]; then     # If the user chooses to create a new database
+            create_database "$db_name"   # Call the function to create a new database
+        fi
+        return                           # Return from the function
+    fi
+
+    while true                           # Enter an infinite loop for the connected database
+    do
+        clear                            # Clear the terminal screen
+        echo -e "\e[32m=========================================\e[0m"
+        echo -e "\e[32m=  Connected to database: $db_name\e[0m"
+        echo -e "\e[32m=========================================\e[0m"
+        echo ""
+        echo -e "\e[33mSelect an option:\e[0m"
+        echo ""
+        echo -e "\e[33m1. Create table\e[0m"
+        echo -e "\e[33m2. List tables\e[0m"
+        echo -e "\e[33m3. Drop table\e[0m"
+        echo -e "\e[33m4. Insert into table\e[0m"
+        echo -e "\e[33m5. Delete from table\e[0m"
+        echo -e "\e[33m6. Update table\e[0m"
+        echo -e "\e[33m7. Rename database\e[0m"
+        echo -e "\e[33m8. Exit\e[0m"
+        echo ""
+        echo -e "\e[32m=========================================\e[0m"
+
+
+        read choice                       # Read the user's choice from the terminal
+
+        case $choice in                   # Perform actions based on the user's choice
+            1) create_table ;;            # Call the function to create a new table
+            
+            2) list ;;                    # Call the function to list tables
+            
+            3) drop_table ;;              # Call the function to drop a table
+            
+            4) insert ;;                  # Call the function to insert data into a table
+
+            5) delete ;;                  # Call the function to delete data from a table
+            
+            6) update ;;                  # Call the function to update data in a table
+            
+            7)                             # Option to rename the database
+                echo "Enter the new name for the database:"
+                read new_db_name           # Prompt the user to enter the new name for the database
+                if [[ "$new_db_name" =~ ^[0-9] ]] || [[ "$new_db_name" =~ [\!\@\#\$\%\^\&\*\(\)\+\=\-\{\}\;\:\.\,\<\>\?\/\[\]\|\`\~\"\'\ ] ]]; then
+                    echo "Invalid database name."
+                else
+                    mv "$db_dir" "$ROOT_DIR/$new_db_name"  # Rename the database by moving the directory
+                    echo "Database renamed to: $new_db_name"
+                    db_name=$new_db_name   # Update the current database name
+                fi
+                ;;
+
+            8) exit ;;                    # Exit the script
+
+            *) echo "Invalid option. Please select again." ;;  # Display an error message for invalid options
+        esac
+
+        echo ""
+        echo -e "\e[32m=========================================\e[0m"
+        echo -e "\e[32m=  Press any key to continue...\e[0m"
+        echo -e "\e[32m=========================================\e[0m"
+        read -n 1 -s                      # Wait for user input to continue
+    done
+}
+
